@@ -47,6 +47,8 @@ dependencies:
   equatable: ^2.0.5 # better check if objects are the same
   quiver: ^3.2.1 # can use Optional
 
+  url_launcher: ^6.1.10 # open link if provided in details
+
   fluttertoast: ^8.2.1 # display UI messages
   logger: ^1.3.0 # logging e.g. errors, warnings
 

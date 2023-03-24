@@ -7,13 +7,13 @@ abstract class ActivitiesError extends Equatable {
   const ActivitiesError(this.code, this.message);
 }
 
-class GetRandomActivitiesError extends ActivitiesError {
-  const GetRandomActivitiesError({
+class GetActivitiesError extends ActivitiesError {
+  const GetActivitiesError({
     String? code,
     String? message,
   }) : super(code, message);
 
-  static GetRandomActivitiesError get unknown => const GetRandomActivitiesError(
+  static GetActivitiesError get unknown => const GetActivitiesError(
         code: 'unknown',
         message: 'Unknown get random activities error.',
       );

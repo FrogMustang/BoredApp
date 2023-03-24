@@ -22,7 +22,7 @@ class ActivitiesBloc extends Bloc<ActivitiesEvent, ActivitiesState> {
 
   ActivitiesBloc({
     required this.activityRepo,
-  }) : super(ActivitiesState(status: ActivitiesStatus.neverFetched)) {
+  }) : super(ActivitiesState()) {
     on<ActivitiesEvent>(_onEvent, transformer: sequential<ActivitiesEvent>());
   }
 
@@ -30,11 +30,19 @@ class ActivitiesBloc extends Bloc<ActivitiesEvent, ActivitiesState> {
     ActivitiesEvent event,
     Emitter<ActivitiesState> emit,
   ) {
+    log.d('New event: $event \n');
+
     if (event is _GetRandomActivities) {
       return _onGetRandomActivities(
         emit: emit,
         event: event,
       );
+    } else if (event is _GetFilteredActivities) {
+      return _onGetFilteredActivities(emit: emit, event: event);
+    } else if (event is ResetFilteredActivities) {
+      return _onResetFilteredActivities(emit: emit, event: event);
+    } else if (event is SelectedActivity) {
+      return _onSelectedActivity(emit: emit, event: event);
     }
   }
 
@@ -45,23 +53,19 @@ class ActivitiesBloc extends Bloc<ActivitiesEvent, ActivitiesState> {
     try {
       // fetching activities, so status is loading
       emit(state.copyWith(
-        status: ActivitiesStatus.loading,
+        randomStatus: ActivitiesStatus.loading,
         error: const Optional.absent(),
       ));
 
       // get activities
-      Iterable<Activity?> activities = await activityRepo.getRandomActivities(
+      List<Activity?> activities = await activityRepo.getRandomActivities(
         howMany: event.howMany,
       );
 
-      // append the newly fetched activities to the existing ones
-      List<Activity?> newActivities = List.from(state.activities);
-      newActivities.addAll(activities);
-
       // activities fetched, so status is fetched
       emit(state.copyWith(
-        status: ActivitiesStatus.fetched,
-        activities: newActivities,
+        randomStatus: ActivitiesStatus.fetched,
+        randomActivities: activities,
         error: const Optional.absent(),
       ));
     } on SocketException catch (e, stackTrace) {
@@ -74,9 +78,9 @@ class ActivitiesBloc extends Bloc<ActivitiesEvent, ActivitiesState> {
 
       // get activities failed
       emit(state.copyWith(
-        status: ActivitiesStatus.failed,
+        randomStatus: ActivitiesStatus.failed,
         error: Optional.of(
-          const GetRandomActivitiesError(message: 'No internet connection'),
+          const GetActivitiesError(message: 'No internet connection'),
         ),
       ));
     } on HttpException catch (e, stackTrace) {
@@ -89,9 +93,9 @@ class ActivitiesBloc extends Bloc<ActivitiesEvent, ActivitiesState> {
 
       // get activities failed
       emit(state.copyWith(
-        status: ActivitiesStatus.failed,
+        randomStatus: ActivitiesStatus.failed,
         error: Optional.of(
-          const GetRandomActivitiesError(message: 'Activities not found'),
+          const GetActivitiesError(message: 'Activities not found'),
         ),
       ));
     } on FormatException catch (e, stackTrace) {
@@ -104,22 +108,135 @@ class ActivitiesBloc extends Bloc<ActivitiesEvent, ActivitiesState> {
 
       // get activities failed
       emit(state.copyWith(
-        status: ActivitiesStatus.failed,
+        randomStatus: ActivitiesStatus.failed,
         error: Optional.of(
-          const GetRandomActivitiesError(message: 'Activities not found'),
+          const GetActivitiesError(message: 'Activities not found'),
         ),
       ));
     } catch (e, stackTrace) {
       log.e(
-        'Get random activities unknown error. \n'
+        'Get activities unknown error. \n'
         '${e.toString()}',
         e,
         stackTrace,
       );
 
       emit(state.copyWith(
-        status: ActivitiesStatus.failed,
-        error: Optional.of(GetRandomActivitiesError.unknown),
+        randomStatus: ActivitiesStatus.failed,
+        error: Optional.of(e),
+      ));
+    }
+  }
+
+  Future<void> _onGetFilteredActivities({
+    required Emitter<ActivitiesState> emit,
+    required _GetFilteredActivities event,
+  }) async {
+    try {
+      // fetching activities, so status is loading
+      emit(state.copyWith(
+        filteredStatus: ActivitiesStatus.loading,
+        error: const Optional.absent(),
+      ));
+
+      // get activities
+      List<Activity?> filteredActivities =
+          await activityRepo.getFilteredActivities(
+        howMany: event.howMany,
+        type: event.type,
+        participants: event.participants,
+        minPrice: event.minPrice,
+        maxPrice: event.maxPrice,
+        minAccessibility: event.minAccessibility,
+        maxAccessibility: event.maxAccessibility,
+      );
+
+      // activities fetched, so status is fetched
+      emit(state.copyWith(
+        filteredStatus: ActivitiesStatus.fetched,
+        filteredActivities: filteredActivities,
+        error: const Optional.absent(),
+      ));
+    } on SocketException catch (e, stackTrace) {
+      log.e(
+        'No internet. \n'
+        '${e.message}',
+        e,
+        stackTrace,
+      );
+
+      // get activities failed
+      emit(state.copyWith(
+        filteredStatus: ActivitiesStatus.failed,
+        error: Optional.of(
+          const GetActivitiesError(message: 'No internet connection'),
+        ),
+      ));
+    } on HttpException catch (e, stackTrace) {
+      log.e(
+        'Activities not found. \n'
+        '${e.message}',
+        e,
+        stackTrace,
+      );
+
+      // get activities failed
+      emit(state.copyWith(
+        filteredStatus: ActivitiesStatus.failed,
+        error: Optional.of(
+          const GetActivitiesError(message: 'Activities not found'),
+        ),
+      ));
+    } on FormatException catch (e, stackTrace) {
+      log.e(
+        'Activities not found. \n'
+        '${e.message}',
+        e,
+        stackTrace,
+      );
+
+      // get activities failed
+      emit(state.copyWith(
+        filteredStatus: ActivitiesStatus.failed,
+        error: Optional.of(
+          const GetActivitiesError(message: 'Activities not found'),
+        ),
+      ));
+    } catch (e, stackTrace) {
+      log.e(
+        'Get activities unknown error. \n'
+        '${e.toString()}',
+        e,
+        stackTrace,
+      );
+
+      emit(state.copyWith(
+        filteredStatus: ActivitiesStatus.failed,
+        error: Optional.of(e),
+      ));
+    }
+  }
+
+  Future<void> _onResetFilteredActivities({
+    required Emitter<ActivitiesState> emit,
+    required ResetFilteredActivities event,
+  }) async {
+    emit(state.copyWith(
+      filteredActivities: [],
+    ));
+  }
+
+  Future<void> _onSelectedActivity({
+    required Emitter<ActivitiesState> emit,
+    required SelectedActivity event,
+  }) async {
+    if (event.activity != null) {
+      emit(state.copyWith(
+        selectedActivity: Optional.fromNullable(event.activity),
+      ));
+    } else {
+      emit(state.copyWith(
+        selectedActivity: const Optional.absent(),
       ));
     }
   }
