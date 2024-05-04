@@ -1,5 +1,3 @@
-import 'package:bored_app/application.dart';
-import 'package:bored_app/bloc/activity/activities_bloc.dart';
 import 'package:bored_app/screen/activity_details_screen.dart';
 import 'package:bored_app/screen/home_screen.dart';
 import 'package:go_router/go_router.dart';

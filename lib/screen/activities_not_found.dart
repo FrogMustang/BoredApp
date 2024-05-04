@@ -1,6 +1,5 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:go_router/go_router.dart';
 
 class ActivitiesNotFound extends StatelessWidget {
   const ActivitiesNotFound({Key? key}) : super(key: key);
@@ -10,9 +9,9 @@ class ActivitiesNotFound extends StatelessWidget {
     return SizedBox(
       height: MediaQuery.of(context).size.height * 0.7,
       width: MediaQuery.of(context).size.width,
-      child: Column(
+      child: const Column(
         mainAxisAlignment: MainAxisAlignment.center,
-        children: const [
+        children: [
           Spacer(),
           Text(
             'No activities found :/',

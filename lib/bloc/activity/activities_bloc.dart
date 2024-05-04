@@ -11,9 +11,7 @@ import 'package:logger/logger.dart';
 import 'package:quiver/core.dart';
 
 part 'activities_event.dart';
-
 part 'activities_state.dart';
-
 part 'package:bored_app/controllers/activities_controller.dart';
 
 class ActivitiesBloc extends Bloc<ActivitiesEvent, ActivitiesState> {
@@ -72,8 +70,8 @@ class ActivitiesBloc extends Bloc<ActivitiesEvent, ActivitiesState> {
       log.e(
         'No internet. \n'
         '${e.message}',
-        e,
-        stackTrace,
+        error: e,
+        stackTrace: stackTrace,
       );
 
       // get activities failed
@@ -87,8 +85,8 @@ class ActivitiesBloc extends Bloc<ActivitiesEvent, ActivitiesState> {
       log.e(
         'Activities not found. \n'
         '${e.message}',
-        e,
-        stackTrace,
+        error: e,
+        stackTrace: stackTrace,
       );
 
       // get activities failed
@@ -102,8 +100,8 @@ class ActivitiesBloc extends Bloc<ActivitiesEvent, ActivitiesState> {
       log.e(
         'Activities not found. \n'
         '${e.message}',
-        e,
-        stackTrace,
+        error: e,
+        stackTrace: stackTrace,
       );
 
       // get activities failed
@@ -117,8 +115,8 @@ class ActivitiesBloc extends Bloc<ActivitiesEvent, ActivitiesState> {
       log.e(
         'Get activities unknown error. \n'
         '${e.toString()}',
-        e,
-        stackTrace,
+        error: e,
+        stackTrace: stackTrace,
       );
 
       emit(state.copyWith(
@@ -161,8 +159,8 @@ class ActivitiesBloc extends Bloc<ActivitiesEvent, ActivitiesState> {
       log.e(
         'No internet. \n'
         '${e.message}',
-        e,
-        stackTrace,
+        error: e,
+        stackTrace: stackTrace,
       );
 
       // get activities failed
@@ -176,8 +174,8 @@ class ActivitiesBloc extends Bloc<ActivitiesEvent, ActivitiesState> {
       log.e(
         'Activities not found. \n'
         '${e.message}',
-        e,
-        stackTrace,
+        error: e,
+        stackTrace: stackTrace,
       );
 
       // get activities failed
@@ -191,8 +189,8 @@ class ActivitiesBloc extends Bloc<ActivitiesEvent, ActivitiesState> {
       log.e(
         'Activities not found. \n'
         '${e.message}',
-        e,
-        stackTrace,
+        error: e,
+        stackTrace: stackTrace,
       );
 
       // get activities failed
@@ -206,8 +204,8 @@ class ActivitiesBloc extends Bloc<ActivitiesEvent, ActivitiesState> {
       log.e(
         'Get activities unknown error. \n'
         '${e.toString()}',
-        e,
-        stackTrace,
+        error: e,
+        stackTrace: stackTrace,
       );
 
       emit(state.copyWith(
