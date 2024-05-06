@@ -7,11 +7,12 @@ class ActivitiesController {
     required ActivitiesBloc activityBloc,
   }) : _activityBloc = activityBloc;
 
-  /// Send Bloc event to fetch [howMany] random items from API
+  /// Add Bloc event to fetch [howMany] random items from API
   void getRandomActivities({required int howMany}) {
-    _activityBloc.add(_GetRandomActivities(howMany));
+    _activityBloc.add(GetRandomActivities(howMany));
   }
 
+  /// Add Bloc event to fetch filtered activities from API
   void getFilteredActivities({
     required int howMany,
     String? type,
@@ -21,15 +22,17 @@ class ActivitiesController {
     double? minAccessibility,
     double? maxAccessibility,
   }) {
-    _activityBloc.add(_GetFilteredActivities(
-      howMany: howMany,
-      type: type,
-      participants: participants,
-      minPrice: minPrice,
-      maxPrice: maxPrice,
-      minAccessibility: minAccessibility,
-      maxAccessibility: maxAccessibility,
-    ));
+    _activityBloc.add(
+      GetFilteredActivities(
+        howMany: howMany,
+        type: type,
+        participants: participants,
+        minPrice: minPrice,
+        maxPrice: maxPrice,
+        minAccessibility: minAccessibility,
+        maxAccessibility: maxAccessibility,
+      ),
+    );
   }
 
   void resetFilteredActivities() {

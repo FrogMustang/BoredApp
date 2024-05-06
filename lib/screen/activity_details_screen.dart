@@ -10,7 +10,7 @@ import 'package:go_router/go_router.dart';
 import 'package:url_launcher/url_launcher.dart';
 
 class ActivityDetailsScreen extends StatefulWidget {
-  const ActivityDetailsScreen({Key? key}) : super(key: key);
+  const ActivityDetailsScreen({super.key});
 
   @override
   State<ActivityDetailsScreen> createState() => _ActivityDetailsScreenState();

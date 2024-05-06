@@ -5,6 +5,7 @@ enum ActivitiesStatus {
   loading,
   fetched,
   failed,
+  noMoreActivitiesFound,
 }
 
 final Logger _log = Logger(
@@ -16,45 +17,27 @@ final Logger _log = Logger(
 
 class ActivitiesState extends Equatable {
   final ActivitiesStatus randomStatus;
-  final List<Activity?> randomActivities;
+  final List<Activity> randomActivities;
   final Activity? selectedActivity;
   final ActivitiesStatus filteredStatus;
-  final List<Activity?> filteredActivities;
+  final List<Activity> filteredActivities;
   final dynamic error;
 
-  const ActivitiesState._(
-    this.randomStatus,
-    this.randomActivities,
+  const ActivitiesState({
+    this.randomStatus = ActivitiesStatus.neverFetched,
+    this.randomActivities = const [],
     this.selectedActivity,
-    this.filteredStatus,
-    this.filteredActivities,
+    this.filteredStatus = ActivitiesStatus.neverFetched,
+    this.filteredActivities = const [],
     this.error,
-  );
-
-  factory ActivitiesState({
-    ActivitiesStatus randomStatus = ActivitiesStatus.neverFetched,
-    List<Activity?> randomActivities = const [],
-    Activity? selectedActivity,
-    ActivitiesStatus filteredStatus = ActivitiesStatus.neverFetched,
-    List<Activity?> filteredActivities = const [],
-    dynamic error,
-  }) {
-    return ActivitiesState._(
-      randomStatus,
-      randomActivities,
-      selectedActivity,
-      filteredStatus,
-      filteredActivities,
-      error,
-    );
-  }
+  });
 
   ActivitiesState copyWith({
     ActivitiesStatus? randomStatus,
-    List<Activity?>? randomActivities,
+    List<Activity>? randomActivities,
     Optional<Activity>? selectedActivity,
     ActivitiesStatus? filteredStatus,
-    List<Activity?>? filteredActivities,
+    List<Activity>? filteredActivities,
     Optional<dynamic>? error,
   }) {
     ActivitiesState newState = ActivitiesState(
@@ -68,7 +51,7 @@ class ActivitiesState extends Equatable {
       error: error != null ? error.orNull : this.error,
     );
 
-    _log.i('Old state: $this \n'
+    _log.t('COPY WITH --- Old state: $this \n'
         'New state: $newState');
     return newState;
   }
@@ -86,9 +69,8 @@ class ActivitiesState extends Equatable {
   @override
   String toString() {
     return 'Status: $randomStatus \n'
-        // 'Activities: $activities \n'
         'Selected activity: $selectedActivity \n'
-        // 'Filtered Activities: filteredActivities \n'
+        'Filtered Activities: $filteredActivities \n'
         'Error: $error \n';
   }
 }

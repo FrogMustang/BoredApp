@@ -78,7 +78,6 @@ class Activity extends Equatable {
 
   @override
   List<Object?> get props => [
-        key,
         name,
         type,
         participants,

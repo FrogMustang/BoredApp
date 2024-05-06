@@ -32,9 +32,9 @@ class BoredAppLauncher extends StatefulWidget {
   final ActivitiesBloc activitiesBloc;
 
   const BoredAppLauncher({
-    Key? key,
+    super.key,
     required this.activitiesBloc,
-  }) : super(key: key);
+  });
 
   @override
   State<BoredAppLauncher> createState() => _BoredAppLauncherState();

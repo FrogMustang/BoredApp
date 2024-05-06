@@ -2,10 +2,10 @@ part of 'activities_bloc.dart';
 
 abstract class ActivitiesEvent extends Equatable {}
 
-class _GetRandomActivities extends ActivitiesEvent {
+class GetRandomActivities extends ActivitiesEvent {
   final int howMany;
 
-  _GetRandomActivities(this.howMany);
+  GetRandomActivities(this.howMany);
 
   @override
   List<Object?> get props => [
@@ -13,7 +13,7 @@ class _GetRandomActivities extends ActivitiesEvent {
       ];
 }
 
-class _GetFilteredActivities extends ActivitiesEvent {
+class GetFilteredActivities extends ActivitiesEvent {
   final int howMany;
   final String? type;
   final int? participants;
@@ -22,7 +22,7 @@ class _GetFilteredActivities extends ActivitiesEvent {
   final double? minAccessibility;
   final double? maxAccessibility;
 
-  _GetFilteredActivities({
+  GetFilteredActivities({
     required this.howMany,
     this.type,
     this.participants,

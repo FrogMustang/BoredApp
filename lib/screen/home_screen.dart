@@ -14,7 +14,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
 
 class HomeScreen extends StatefulWidget {
-  const HomeScreen({Key? key}) : super(key: key);
+  const HomeScreen({super.key});
 
   @override
   State<HomeScreen> createState() => _HomeScreenState();
@@ -79,8 +79,6 @@ class _HomeScreenState extends State<HomeScreen> {
       }
     });
 
-    activitiesController.getFilteredActivities(howMany: 20);
-
     filteredScrollController.addListener(() {
       if (filteredScrollController.position.extentAfter < 500 &&
           _activitiesBloc.state.filteredStatus != ActivitiesStatus.loading) {
@@ -111,6 +109,10 @@ class _HomeScreenState extends State<HomeScreen> {
           setState(() {
             _selectedTab = index;
           });
+
+          if (index == 1) {
+            activitiesController.getFilteredActivities(howMany: 10);
+          }
         },
         items: [
           BottomNavigationBarItem(
@@ -183,37 +185,43 @@ class _HomeScreenState extends State<HomeScreen> {
                                             borderRadius:
                                                 BorderRadius.circular(20),
                                           ),
-                                          child: Column(
-                                            crossAxisAlignment:
-                                                CrossAxisAlignment.start,
-                                            children: [
-                                              const Text(
-                                                'Type',
-                                                style: TextStyle(
-                                                  color: Colors.white,
-                                                  fontWeight: FontWeight.bold,
-                                                  fontSize: 20,
+                                          child: SingleChildScrollView(
+                                            child: Column(
+                                              crossAxisAlignment:
+                                                  CrossAxisAlignment.start,
+                                              children: [
+                                                const Text(
+                                                  'Type',
+                                                  style: TextStyle(
+                                                    color: Colors.white,
+                                                    fontWeight: FontWeight.bold,
+                                                    fontSize: 20,
+                                                  ),
                                                 ),
-                                              ),
-                                              const SizedBox(height: 10),
-                                              const Divider(
-                                                color: Colors.white,
-                                                height: 2,
-                                              ),
-                                              const SizedBox(height: 10),
-                                              _buildTypeChips(setState),
-                                              const SizedBox(height: 30),
-                                              ..._buildPriceSlider(setState),
-                                              const SizedBox(height: 30),
-                                              ..._buildParticipantsSlider(
-                                                  setState),
-                                              const SizedBox(height: 30),
-                                              ..._buildAccessibilitySlider(
-                                                  setState),
-                                              const SizedBox(height: 30),
-                                              _buildApplyFiltersButton(
-                                                  setState, dialogContext),
-                                            ],
+                                                const SizedBox(height: 10),
+                                                const Divider(
+                                                  color: Colors.white,
+                                                  height: 2,
+                                                ),
+                                                const SizedBox(height: 10),
+                                                _buildTypeChips(setState),
+                                                const SizedBox(height: 30),
+                                                ..._buildPriceSlider(setState),
+                                                const SizedBox(height: 30),
+                                                ..._buildParticipantsSlider(
+                                                  setState,
+                                                ),
+                                                const SizedBox(height: 30),
+                                                ..._buildAccessibilitySlider(
+                                                  setState,
+                                                ),
+                                                const SizedBox(height: 30),
+                                                _buildApplyFiltersButton(
+                                                  setState,
+                                                  dialogContext,
+                                                ),
+                                              ],
+                                            ),
                                           ),
                                         ),
                                       );
@@ -227,7 +235,7 @@ class _HomeScreenState extends State<HomeScreen> {
                   ],
                 ),
               ),
-              _buildActivitiesList(),
+              Expanded(child: _buildActivitiesList()),
             ],
           ),
         ),
@@ -243,28 +251,26 @@ class _HomeScreenState extends State<HomeScreen> {
           if ((state.randomStatus == ActivitiesStatus.fetched ||
                   state.randomStatus == ActivitiesStatus.loading) &&
               state.randomActivities.isNotEmpty) {
-            return Expanded(
-              child: ScrollConfiguration(
-                behavior: NoMoreGlow(),
-                child: Padding(
-                  padding: const EdgeInsets.symmetric(horizontal: 24),
-                  child: ListView(
-                    key: const Key('randomList'),
-                    controller: randomScrollController,
-                    children: [
-                      for (int i = 1; i <= state.randomActivities.length; i++)
-                        _buildActivity(
-                          state.randomActivities[i - 1],
-                          i,
-                          state.randomStatus,
-                        ),
-                      if (state.randomStatus == ActivitiesStatus.loading)
-                        const Padding(
-                          padding: EdgeInsets.symmetric(vertical: 20),
-                          child: CupertinoActivityIndicator(),
-                        ),
-                    ],
-                  ),
+            return ScrollConfiguration(
+              behavior: NoMoreGlow(),
+              child: Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 24),
+                child: ListView(
+                  key: const Key('randomList'),
+                  controller: randomScrollController,
+                  children: [
+                    for (int i = 1; i <= state.randomActivities.length; i++)
+                      _buildActivity(
+                        state.randomActivities[i - 1],
+                        i,
+                        state.randomStatus,
+                      ),
+                    if (state.randomStatus == ActivitiesStatus.loading)
+                      const Padding(
+                        padding: EdgeInsets.symmetric(vertical: 20),
+                        child: CupertinoActivityIndicator(),
+                      ),
+                  ],
                 ),
               ),
             );
@@ -273,15 +279,13 @@ class _HomeScreenState extends State<HomeScreen> {
           if (state.error != null) {
             return ErrorScreen(
               retryCallback: () {
-                activitiesController.getRandomActivities(howMany: 20);
+                activitiesController.getRandomActivities(howMany: 10);
               },
             );
           }
 
-          return const Expanded(
-            child: Center(
-              child: CupertinoActivityIndicator(),
-            ),
+          return const Center(
+            child: CupertinoActivityIndicator(),
           );
         },
       );
@@ -293,28 +297,26 @@ class _HomeScreenState extends State<HomeScreen> {
           if ((state.filteredStatus == ActivitiesStatus.fetched ||
                   state.filteredStatus == ActivitiesStatus.loading) &&
               state.filteredActivities.isNotEmpty) {
-            return Expanded(
-              child: ScrollConfiguration(
-                behavior: NoMoreGlow(),
-                child: Padding(
-                  padding: const EdgeInsets.symmetric(horizontal: 24),
-                  child: ListView(
-                    key: const Key('filteredList'),
-                    controller: filteredScrollController,
-                    children: [
-                      for (int i = 1; i <= state.filteredActivities.length; i++)
-                        _buildActivity(
-                          state.filteredActivities[i - 1],
-                          i,
-                          state.filteredStatus,
-                        ),
-                      if (state.filteredStatus == ActivitiesStatus.loading)
-                        const Padding(
-                          padding: EdgeInsets.symmetric(vertical: 20),
-                          child: CupertinoActivityIndicator(),
-                        ),
-                    ],
-                  ),
+            return ScrollConfiguration(
+              behavior: NoMoreGlow(),
+              child: Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 24),
+                child: ListView(
+                  key: const Key('filteredList'),
+                  controller: filteredScrollController,
+                  children: [
+                    for (int i = 1; i <= state.filteredActivities.length; i++)
+                      _buildActivity(
+                        state.filteredActivities[i - 1],
+                        i,
+                        state.filteredStatus,
+                      ),
+                    if (state.filteredStatus == ActivitiesStatus.loading)
+                      const Padding(
+                        padding: EdgeInsets.symmetric(vertical: 20),
+                        child: CupertinoActivityIndicator(),
+                      ),
+                  ],
                 ),
               ),
             );
@@ -328,10 +330,8 @@ class _HomeScreenState extends State<HomeScreen> {
             }
           }
 
-          return const Expanded(
-            child: Center(
-              child: CupertinoActivityIndicator(),
-            ),
+          return const Center(
+            child: CupertinoActivityIndicator(),
           );
         },
       );

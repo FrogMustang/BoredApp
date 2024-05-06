@@ -1,5 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:fluttertoast/fluttertoast.dart';
+import 'package:logger/logger.dart';
+
+final Logger logger = Logger(
+  printer: PrettyPrinter(
+    methodCount: 5,
+  ),
+);
 
 void showErrorToast(
   BuildContext context,
@@ -74,10 +81,10 @@ void showToast(
 class NoMoreGlow extends ScrollBehavior {
   @override
   Widget buildOverscrollIndicator(
-      BuildContext context,
-      Widget child,
-      ScrollableDetails details,
-      ) {
+    BuildContext context,
+    Widget child,
+    ScrollableDetails details,
+  ) {
     return child;
   }
 }
