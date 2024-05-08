@@ -3,7 +3,7 @@ import 'dart:ui';
 import 'package:bored_app/application.dart';
 import 'package:bored_app/bloc/activity/activities_bloc.dart';
 import 'package:bored_app/models/activity.dart';
-import 'package:bored_app/screen/loading_screen.dart';
+import 'package:bored_app/screen/widgets/loading_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
@@ -99,22 +99,17 @@ class _ActivityDetailsScreenState extends State<ActivityDetailsScreen> {
                     ),
                   ),
                   const SizedBox(height: 40),
-                  Hero(
-                    tag: activity.key + activity.name,
-                    child: Material(
-                      color: Colors.transparent,
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        mainAxisAlignment: MainAxisAlignment.end,
-                        children: [
-                          _showTitle(activity),
-                          const SizedBox(height: 10),
-                          _showChips(activity),
-                        ],
-                      ),
-                    ),
+                  Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    mainAxisAlignment: MainAxisAlignment.end,
+                    children: [
+                      _showTitle(activity),
+                      const SizedBox(height: 10),
+                      _showChips(activity),
+                    ],
                   ),
-                  ..._buildDetailsSection(activity),
+                  const SizedBox(height: 40),
+                  _buildDetailsSection(activity),
                   const SizedBox(height: 80),
                 ],
               ),
@@ -233,61 +228,57 @@ class _ActivityDetailsScreenState extends State<ActivityDetailsScreen> {
     );
   }
 
-  List<Widget> _buildDetailsSection(Activity activity) {
-    return [
-      const SizedBox(height: 40),
-      Container(
-        width: MediaQuery.of(context).size.width,
-        padding: const EdgeInsets.symmetric(
-          vertical: 10,
-          horizontal: 24,
-        ),
-        decoration: BoxDecoration(
-          color: Colors.white.withOpacity(0.7),
-          borderRadius: BorderRadius.circular(10),
-        ),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            const Text(
-              'Details',
-              style: TextStyle(
-                fontSize: 20,
-                fontWeight: FontWeight.bold,
-                color: Colors.black,
-              ),
-            ),
-            const SizedBox(height: 10),
-            const Divider(
-              color: Colors.black,
-              height: 2.0,
-            ),
-            const SizedBox(height: 10),
-            Text(
-              'Key: ${activity.key}',
-              style: const TextStyle(
-                // fontSize: 16,
-                // fontWeight: FontWeight.bold,
-                color: Colors.black,
-              ),
-            ),
-            if (activity.link?.isNotEmpty == true) ...[
-              const SizedBox(height: 10),
-              GestureDetector(
-                onTap: () {
-                  final link = Uri.parse(activity.link.toString());
-                  launchUrl(link);
-                },
-                child: Text(
-                  'Link: ${activity.link.toString()}',
-                ),
-              ),
-            ],
-            const SizedBox(height: 10),
-          ],
-        ),
+  Widget _buildDetailsSection(Activity activity) {
+    return Container(
+      padding: const EdgeInsets.symmetric(
+        vertical: 10,
+        horizontal: 24,
       ),
-    ];
+      decoration: BoxDecoration(
+        color: Colors.white.withOpacity(0.7),
+        borderRadius: BorderRadius.circular(10),
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          const Text(
+            'Details',
+            style: TextStyle(
+              fontSize: 20,
+              fontWeight: FontWeight.bold,
+              color: Colors.black,
+            ),
+          ),
+          const SizedBox(height: 10),
+          const Divider(
+            color: Colors.black,
+            height: 2.0,
+          ),
+          const SizedBox(height: 10),
+          Text(
+            'Key: ${activity.key}',
+            style: const TextStyle(
+              // fontSize: 16,
+              // fontWeight: FontWeight.bold,
+              color: Colors.black,
+            ),
+          ),
+          if (activity.link?.isNotEmpty == true) ...[
+            const SizedBox(height: 10),
+            GestureDetector(
+              onTap: () {
+                final link = Uri.parse(activity.link.toString());
+                launchUrl(link);
+              },
+              child: Text(
+                'Link: ${activity.link.toString()}',
+              ),
+            ),
+          ],
+          const SizedBox(height: 10),
+        ],
+      ),
+    );
   }
 }

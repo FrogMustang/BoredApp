@@ -15,36 +15,35 @@ class GetRandomActivities extends ActivitiesEvent {
 
 class GetFilteredActivities extends ActivitiesEvent {
   final int howMany;
-  final String? type;
-  final int? participants;
-  final double? minPrice;
-  final double? maxPrice;
-  final double? minAccessibility;
-  final double? maxAccessibility;
+  final ActivityFilters? filters;
 
   GetFilteredActivities({
     required this.howMany,
-    this.type,
-    this.participants,
-    this.minPrice,
-    this.maxPrice,
-    this.minAccessibility,
-    this.maxAccessibility,
+    this.filters,
   });
 
   @override
   List<Object?> get props => [
         howMany,
-        type,
-        participants,
-        minPrice,
-        maxPrice,
-        minAccessibility,
-        maxAccessibility,
+        filters,
       ];
 }
 
+class UpdateActivityFilters extends ActivitiesEvent {
+  final ActivityFilters filters;
+
+  UpdateActivityFilters({required this.filters});
+
+  @override
+  List<Object?> get props => [filters];
+}
+
 class ResetFilteredActivities extends ActivitiesEvent {
+  @override
+  List<Object?> get props => [];
+}
+
+class ResetFilters extends ActivitiesEvent {
   @override
   List<Object?> get props => [];
 }

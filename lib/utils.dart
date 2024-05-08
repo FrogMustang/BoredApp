@@ -1,3 +1,6 @@
+import 'package:bored_app/application.dart';
+import 'package:bored_app/bloc/activity/activities_bloc.dart';
+import 'package:bored_app/models/activity.dart';
 import 'package:flutter/material.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:logger/logger.dart';
@@ -75,6 +78,65 @@ void showToast(
     toastDuration: const Duration(seconds: 2),
     gravity: gravity ?? ToastGravity.BOTTOM,
   );
+}
+
+/// Used to select the category of activities
+/// (e.g. social, educational, busywork etc.)
+enum ActivityCategory {
+  education(name: 'education'),
+  recreational(name: 'recreational'),
+  social(name: 'social'),
+  diy(name: 'diy'),
+  charity(name: 'charity'),
+  cooking(name: 'cooking'),
+  relaxation(name: 'relaxation'),
+  music(name: 'music'),
+  busywork(name: 'busywork');
+
+  const ActivityCategory({required this.name});
+
+  final String name;
+}
+
+/// Used to easily differentiate between
+/// random activities and filtered activities
+enum ActivityType {
+  random(),
+  filtered();
+
+  const ActivityType();
+
+  String get getName {
+    switch (this) {
+      case ActivityType.random:
+        return "random";
+
+      case ActivityType.filtered:
+        return "filtered";
+
+      default:
+        throw UnimplementedError("Please provide a name "
+            "for the given type: $this");
+    }
+  }
+
+  List<Activity> get getExistingActivities {
+    switch (this) {
+      case ActivityType.random:
+        return List.from(
+          getIt.get<ActivitiesBloc>().state.randomActivities,
+        );
+
+      case ActivityType.filtered:
+        return List.from(
+          getIt.get<ActivitiesBloc>().state.filteredActivities,
+        );
+
+      default:
+        throw UnimplementedError("Please provide a list of existing activities "
+            "for the given type: $this");
+    }
+  }
 }
 
 /// CLASS USED TO REMOVE THE SCROLL GLOW FROM LISTS

@@ -27,7 +27,9 @@ class ActivitiesBloc extends Bloc<ActivitiesEvent, ActivitiesState> {
       transformer: sequential(),
     );
     on<GetFilteredActivities>(onGetFilteredActivities);
+    on<UpdateActivityFilters>(onUpdateActivityFilters);
     on<ResetFilteredActivities>(onResetFilteredActivities);
+    on<ResetFilters>(onResetFilters);
     on<SelectedActivity>(onSelectedActivity);
   }
 
@@ -43,16 +45,31 @@ class ActivitiesBloc extends Bloc<ActivitiesEvent, ActivitiesState> {
         ),
       );
 
-      List<Activity> activities = await activityRepo.getRandomActivities(
+      final Either<String, List<Activity>> result =
+          await activityRepo.getRandomActivities(
         howMany: event.howMany,
       );
 
-      emit(
-        state.copyWith(
-          randomStatus: ActivitiesStatus.fetched,
-          randomActivities: activities,
-          error: const Optional.absent(),
-        ),
+      result.fold(
+        (error) {
+          emit(
+            state.copyWith(
+              randomStatus: ActivitiesStatus.failed,
+              error: Optional.of(
+                GetActivitiesError(message: error.toString()),
+              ),
+            ),
+          );
+        },
+        (activities) {
+          emit(
+            state.copyWith(
+              randomStatus: ActivitiesStatus.fetched,
+              randomActivities: activities,
+              error: const Optional.absent(),
+            ),
+          );
+        },
       );
     } on SocketException catch (e, stackTrace) {
       logger.e(
@@ -135,12 +152,7 @@ class ActivitiesBloc extends Bloc<ActivitiesEvent, ActivitiesState> {
       Either<String, List<Activity>> result =
           await activityRepo.getFilteredActivities(
         howMany: event.howMany,
-        type: event.type,
-        participants: event.participants,
-        minPrice: event.minPrice,
-        maxPrice: event.maxPrice,
-        minAccessibility: event.minAccessibility,
-        maxAccessibility: event.maxAccessibility,
+        filters: event.filters,
       );
 
       result.fold(
@@ -231,6 +243,18 @@ class ActivitiesBloc extends Bloc<ActivitiesEvent, ActivitiesState> {
     }
   }
 
+  void onUpdateActivityFilters(
+    UpdateActivityFilters event,
+    Emitter<ActivitiesState> emit,
+  ) {
+    emit(
+      state.copyWith(
+        filters: Optional.fromNullable(event.filters),
+        error: const Optional.absent(),
+      ),
+    );
+  }
+
   void onResetFilteredActivities(
     ResetFilteredActivities event,
     Emitter<ActivitiesState> emit,
@@ -242,22 +266,29 @@ class ActivitiesBloc extends Bloc<ActivitiesEvent, ActivitiesState> {
     );
   }
 
+  void onResetFilters(
+    ResetFilters event,
+    Emitter<ActivitiesState> emit,
+  ) {
+    emit(
+      state.copyWith(
+        filters: Optional.of(
+          const ActivityFilters(),
+        ),
+      ),
+    );
+  }
+
   void onSelectedActivity(
     SelectedActivity event,
     Emitter<ActivitiesState> emit,
   ) {
-    if (event.activity != null) {
-      emit(
-        state.copyWith(
-          selectedActivity: Optional.fromNullable(event.activity),
+    emit(
+      state.copyWith(
+        selectedActivity: Optional.fromNullable(
+          event.activity,
         ),
-      );
-    } else {
-      emit(
-        state.copyWith(
-          selectedActivity: const Optional.absent(),
-        ),
-      );
-    }
+      ),
+    );
   }
 }

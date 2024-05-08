@@ -15,28 +15,30 @@ class ActivitiesController {
   /// Add Bloc event to fetch filtered activities from API
   void getFilteredActivities({
     required int howMany,
-    String? type,
-    int? participants,
-    double? minPrice,
-    double? maxPrice,
-    double? minAccessibility,
-    double? maxAccessibility,
+    ActivityFilters? filters,
   }) {
     _activityBloc.add(
       GetFilteredActivities(
         howMany: howMany,
-        type: type,
-        participants: participants,
-        minPrice: minPrice,
-        maxPrice: maxPrice,
-        minAccessibility: minAccessibility,
-        maxAccessibility: maxAccessibility,
+        filters: filters,
+      ),
+    );
+  }
+
+  void updateFilters(ActivityFilters newFilters) {
+    _activityBloc.add(
+      UpdateActivityFilters(
+        filters: newFilters,
       ),
     );
   }
 
   void resetFilteredActivities() {
     _activityBloc.add(ResetFilteredActivities());
+  }
+
+  void resetFilters() {
+    _activityBloc.add(ResetFilters());
   }
 
   void selectedActivity({required Activity? activity}) {
