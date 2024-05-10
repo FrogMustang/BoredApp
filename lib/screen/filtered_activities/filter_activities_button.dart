@@ -5,10 +5,7 @@ import 'package:bored_app/utils.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
-/// Used to add events to the [ActivitiesBloc]
-final ActivitiesController _activitiesController = ActivitiesController(
-  activityBloc: getIt<ActivitiesBloc>(),
-);
+final ActivitiesBloc _activitiesBloc = getIt<ActivitiesBloc>();
 
 class FilterActivitiesButton extends StatelessWidget {
   const FilterActivitiesButton({super.key});
@@ -112,10 +109,11 @@ class _CategoryChip extends StatelessWidget {
   Widget build(BuildContext context) {
     return GestureDetector(
       onTap: () {
-        print("MUIE");
-        _activitiesController.updateFilters(
-          filters.copyWith(
-            activityCategory: category,
+        _activitiesBloc.add(
+          UpdateActivityFilters(
+            filters: filters.copyWith(
+              activityCategory: category,
+            ),
           ),
         );
       },
@@ -189,10 +187,12 @@ class _PriceSlider extends StatelessWidget {
             filters.maxPrice.toString(),
           ),
           onChanged: (RangeValues values) {
-            _activitiesController.updateFilters(
-              filters.copyWith(
-                minPrice: values.start,
-                maxPrice: values.end,
+            _activitiesBloc.add(
+              UpdateActivityFilters(
+                filters: filters.copyWith(
+                  minPrice: values.start,
+                  maxPrice: values.end,
+                ),
               ),
             );
           },
@@ -240,9 +240,11 @@ class _ParticipantsSlider extends StatelessWidget {
           min: 1,
           max: 8,
           onChanged: (value) {
-            _activitiesController.updateFilters(
-              filters.copyWith(
-                participants: value.toInt(),
+            _activitiesBloc.add(
+              UpdateActivityFilters(
+                filters: filters.copyWith(
+                  participants: value.toInt(),
+                ),
               ),
             );
           },
@@ -298,10 +300,12 @@ class _AccessibilitySlider extends StatelessWidget {
             filters.maxAccessibility.toString(),
           ),
           onChanged: (RangeValues values) {
-            _activitiesController.updateFilters(
-              filters.copyWith(
-                minAccessibility: values.start,
-                maxAccessibility: values.end,
+            _activitiesBloc.add(
+              UpdateActivityFilters(
+                filters: filters.copyWith(
+                  minAccessibility: values.start,
+                  maxAccessibility: values.end,
+                ),
               ),
             );
           },
@@ -320,12 +324,14 @@ class _ApplyFiltersButton extends StatelessWidget {
       child: ElevatedButton(
         onPressed: () {
           // reset the filters and the filtered activities
-          _activitiesController.resetFilteredActivities();
+          _activitiesBloc.add(ResetFilteredActivities());
 
           // and fetch new ones
-          _activitiesController.getFilteredActivities(
-            howMany: Constants.howManyFilteredActivities,
-            filters: getIt<ActivitiesBloc>().state.filters,
+          _activitiesBloc.add(
+            GetFilteredActivities(
+              howMany: Constants.howManyFilteredActivities,
+              filters: _activitiesBloc.state.filters,
+            ),
           );
 
           Navigator.pop(context);

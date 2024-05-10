@@ -13,7 +13,6 @@ import 'package:quiver/core.dart';
 
 part 'activities_event.dart';
 part 'activities_state.dart';
-part 'package:bored_app/controllers/activities_controller.dart';
 
 class ActivitiesBloc extends Bloc<ActivitiesEvent, ActivitiesState> {
   final ActivitiesRepository activityRepo;
@@ -272,6 +271,7 @@ class ActivitiesBloc extends Bloc<ActivitiesEvent, ActivitiesState> {
   ) {
     emit(
       state.copyWith(
+        filteredActivities: [],
         filters: Optional.of(
           const ActivityFilters(),
         ),

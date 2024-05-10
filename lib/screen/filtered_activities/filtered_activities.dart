@@ -19,35 +19,40 @@ class FilteredActivitiesScreen extends StatefulWidget {
 class _FilteredActivitiesScreenState extends State<FilteredActivitiesScreen> {
   final ActivitiesBloc _activitiesBloc = getIt<ActivitiesBloc>();
 
-  /// Used to add events to the [ActivitiesBloc]
-  final ActivitiesController activitiesController = ActivitiesController(
-    activityBloc: getIt<ActivitiesBloc>(),
-  );
-
   final ScrollController filteredScrollController = ScrollController();
+
+  void _getFilteredActivities() {
+    _activitiesBloc.add(
+      GetFilteredActivities(
+        howMany: Constants.howManyFilteredActivities,
+        filters: _activitiesBloc.state.filters,
+      ),
+    );
+  }
+
+  void _resetFilters() async {
+    // reset the filters
+    _activitiesBloc.add(ResetFilters());
+
+    // wait for the filters to be reset before fetching new activities
+    await Future.delayed(
+      const Duration(milliseconds: 100),
+    );
+
+    /// and get new ones
+    _getFilteredActivities();
+  }
 
   @override
   void initState() {
     super.initState();
 
-    // reset the filtered activities
-    activitiesController.resetFilteredActivities();
-
-    // reset the filters
-    activitiesController.resetFilters();
-
-    /// and get new ones
-    activitiesController.getFilteredActivities(
-      howMany: Constants.howManyFilteredActivities,
-    );
+    _resetFilters();
 
     filteredScrollController.addListener(() {
       if (filteredScrollController.position.extentAfter < 500 &&
           _activitiesBloc.state.filteredStatus != ActivitiesStatus.loading) {
-        activitiesController.getFilteredActivities(
-          howMany: Constants.howManyFilteredActivities,
-          filters: _activitiesBloc.state.filters,
-        );
+        _getFilteredActivities();
       }
     });
   }

@@ -17,28 +17,27 @@ class RandomActivitiesScreen extends StatefulWidget {
 class _RandomActivitiesScreenState extends State<RandomActivitiesScreen> {
   final ActivitiesBloc _activitiesBloc = getIt<ActivitiesBloc>();
 
-  /// Used to add events to the [ActivitiesBloc]
-  final ActivitiesController activitiesController = ActivitiesController(
-    activityBloc: getIt<ActivitiesBloc>(),
-  );
-
   /// Used to fetch more activities when almost at the end of the list
   final ScrollController randomScrollController = ScrollController();
+
+  void _getRandomActivities() {
+    _activitiesBloc.add(
+      GetRandomActivities(
+        Constants.howManyRandomActivities,
+      ),
+    );
+  }
 
   @override
   void initState() {
     super.initState();
 
-    activitiesController.getRandomActivities(
-      howMany: Constants.howManyRandomActivities,
-    );
+    _getRandomActivities();
 
     randomScrollController.addListener(() {
       if (randomScrollController.position.extentAfter < 500 &&
           _activitiesBloc.state.randomStatus != ActivitiesStatus.loading) {
-        activitiesController.getRandomActivities(
-          howMany: Constants.howManyRandomActivities,
-        );
+        _getRandomActivities();
       }
     });
   }
@@ -85,11 +84,7 @@ class _RandomActivitiesScreenState extends State<RandomActivitiesScreen> {
 
         if (state.error != null) {
           return ErrorScreen(
-            retryCallback: () {
-              activitiesController.getRandomActivities(
-                howMany: Constants.howManyRandomActivities,
-              );
-            },
+            retryCallback: _getRandomActivities,
           );
         }
 

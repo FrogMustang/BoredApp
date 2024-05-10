@@ -17,10 +17,7 @@ class ActivityDetailsScreen extends StatefulWidget {
 }
 
 class _ActivityDetailsScreenState extends State<ActivityDetailsScreen> {
-  final _activitiesBloc = getIt<ActivitiesBloc>();
-  final activitiesController = ActivitiesController(
-    activityBloc: getIt<ActivitiesBloc>(),
-  );
+  final ActivitiesBloc _activitiesBloc = getIt<ActivitiesBloc>();
 
   @override
   Widget build(BuildContext context) {
@@ -92,9 +89,14 @@ class _ActivityDetailsScreenState extends State<ActivityDetailsScreen> {
                       onPressed: () {
                         context.pop();
 
-                        Future.delayed(const Duration(milliseconds: 300), () {
-                          activitiesController.selectedActivity(activity: null);
-                        });
+                        Future.delayed(
+                          const Duration(milliseconds: 300),
+                          () {
+                            _activitiesBloc.add(
+                              SelectedActivity(null),
+                            );
+                          },
+                        );
                       },
                     ),
                   ),

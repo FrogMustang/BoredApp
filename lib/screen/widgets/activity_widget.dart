@@ -25,10 +25,7 @@ class ActivityWidget extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    /// Used to add events to the [ActivitiesBloc]
-    final ActivitiesController activitiesController = ActivitiesController(
-      activityBloc: getIt<ActivitiesBloc>(),
-    );
+    final ActivitiesBloc activitiesBloc = getIt<ActivitiesBloc>();
 
     return Container(
       height: 230,
@@ -37,7 +34,7 @@ class ActivityWidget extends StatelessWidget {
         onTap: status == ActivitiesStatus.loading
             ? null
             : () {
-                activitiesController.selectedActivity(activity: activity);
+                activitiesBloc.add(SelectedActivity(activity));
                 context.pushNamed(AppRoute.detailsView.name);
               },
         child: Stack(
