@@ -12,87 +12,204 @@ class FilterActivitiesButton extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final DraggableScrollableController sheetController =
+        DraggableScrollableController();
+
     return IconButton(
       icon: const Icon(
         Icons.filter_list_rounded,
         size: 24,
       ),
       onPressed: () async {
-        await showDialog(
+        // Not the best UX, but it's meant to showcase some UI skills
+        showBottomSheet(
           context: context,
+          enableDrag: false,
+          backgroundColor: Colors.transparent,
           builder: (context) {
             return BlocProvider.value(
-              value: getIt.get<ActivitiesBloc>(),
-              child: BlocBuilder<ActivitiesBloc, ActivitiesState>(
-                  builder: (context, state) {
-                final ActivityFilters filters = state.filters!;
+              value: getIt<ActivitiesBloc>(),
+              child: DraggableScrollableSheet(
+                expand: false,
+                maxChildSize: 0.9,
+                minChildSize: 0.3,
+                initialChildSize: 0.3,
+                shouldCloseOnMinExtent: false,
+                controller: sheetController,
+                builder: (context, scrollController) {
+                  final size = MediaQuery.sizeOf(context);
 
-                return AlertDialog(
-                  backgroundColor: Colors.black.withOpacity(0.7),
-                  content: Container(
-                    decoration: BoxDecoration(
-                      borderRadius: BorderRadius.circular(20),
-                    ),
-                    child: SingleChildScrollView(
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          const Text(
-                            'Type',
-                            style: TextStyle(
-                              color: Colors.white,
-                              fontWeight: FontWeight.bold,
-                              fontSize: 20,
-                            ),
-                          ),
-                          const SizedBox(height: 10),
-                          const Divider(
-                            color: Colors.white,
-                            height: 2,
-                          ),
-                          const SizedBox(height: 10),
-
-                          /// ACTIVITY TYPE CHIPS
-                          Wrap(
-                            spacing: 10,
-                            runSpacing: 10,
-                            children: ActivityCategory.values
-                                .map(
-                                  (ActivityCategory category) => _CategoryChip(
-                                    category: category,
-                                    filters: state.filters!,
-                                  ),
-                                )
-                                .toList(),
-                          ),
-                          const SizedBox(height: 30),
-
-                          /// PRICE SLIDER
-                          _PriceSlider(
-                            filters: filters,
-                          ),
-
-                          const SizedBox(height: 30),
-                          _ParticipantsSlider(
-                            filters: filters,
-                          ),
-                          const SizedBox(height: 30),
-                          _AccessibilitySlider(
-                            filters: filters,
-                          ),
-                          const SizedBox(height: 30),
-                          const _ApplyFiltersButton(),
-                        ],
+                  return Container(
+                    decoration: const BoxDecoration(
+                      color: Colors.grey,
+                      borderRadius: BorderRadius.only(
+                        topLeft: Radius.circular(10),
+                        topRight: Radius.circular(10),
                       ),
                     ),
-                  ),
-                );
-              }),
+                    child: Column(
+                      children: [
+                        const SizedBox(height: 20),
+
+                        // DRAG HANDLE
+                        ScrollConfiguration(
+                          behavior: NoMoreGlow(),
+                          child: SizedBox(
+                            height: 20,
+                            width: size.width,
+                            child: SingleChildScrollView(
+                              controller: scrollController,
+                              child: Center(
+                                child: Container(
+                                  height: 3,
+                                  width: 70,
+                                  decoration: BoxDecoration(
+                                    color: Colors.white,
+                                    borderRadius: BorderRadius.circular(200),
+                                  ),
+                                ),
+                              ),
+                            ),
+                          ),
+                        ),
+
+                        Flexible(
+                          child: _SheetContent(
+                            sheetController: sheetController,
+                          ),
+                        ),
+                      ],
+                    ),
+                  );
+                },
+              ),
             );
           },
         );
       },
     );
+  }
+}
+
+class _SheetContent extends StatefulWidget {
+  const _SheetContent({
+    super.key,
+    required this.sheetController,
+  });
+
+  final DraggableScrollableController sheetController;
+
+  @override
+  State<_SheetContent> createState() => _SheetContentState();
+}
+
+class _SheetContentState extends State<_SheetContent> {
+  bool isExpanded = false;
+
+  @override
+  Widget build(BuildContext context) {
+    return BlocBuilder<ActivitiesBloc, ActivitiesState>(
+        builder: (context, state) {
+      final filters = state.filters!;
+
+      return SingleChildScrollView(
+        padding: const EdgeInsets.symmetric(horizontal: 25),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Row(
+              mainAxisAlignment: MainAxisAlignment.end,
+              children: [
+                GestureDetector(
+                  onTap: () {
+                    setState(() {
+                      widget.sheetController.animateTo(
+                        isExpanded
+                            ? Constants.minFiltersSheetSize
+                            : Constants.maxFiltersSheetSize,
+                        duration: const Duration(milliseconds: 400),
+                        curve: Curves.easeInOut,
+                      );
+
+                      isExpanded = !isExpanded;
+                    });
+                  },
+                  child: Padding(
+                    padding: const EdgeInsets.only(right: 20),
+                    child: Icon(
+                      isExpanded ? Icons.fullscreen_exit : Icons.fullscreen,
+                      size: 20,
+                      color: Colors.white,
+                    ),
+                  ),
+                ),
+                GestureDetector(
+                  onTap: () {
+                    Navigator.pop(context);
+                  },
+                  child: const Padding(
+                    padding: EdgeInsets.only(right: 20),
+                    child: Icon(
+                      Icons.close,
+                      size: 20,
+                      color: Colors.white,
+                    ),
+                  ),
+                ),
+              ],
+            ),
+
+            const Text(
+              'Type',
+              style: TextStyle(
+                color: Colors.white,
+                fontWeight: FontWeight.bold,
+                fontSize: 20,
+              ),
+            ),
+            const SizedBox(height: 10),
+            const Divider(
+              color: Colors.white,
+              height: 2,
+            ),
+            const SizedBox(height: 10),
+
+            /// ACTIVITY TYPE CHIPS
+            Wrap(
+              spacing: 10,
+              runSpacing: 10,
+              children: ActivityCategory.values
+                  .map(
+                    (ActivityCategory category) => _CategoryChip(
+                      category: category,
+                      filters: filters,
+                    ),
+                  )
+                  .toList(),
+            ),
+            const SizedBox(height: 30),
+
+            /// PRICE SLIDER
+            _PriceSlider(
+              filters: filters,
+            ),
+
+            const SizedBox(height: 30),
+            _ParticipantsSlider(
+              filters: filters,
+            ),
+            const SizedBox(height: 30),
+            _AccessibilitySlider(
+              filters: filters,
+            ),
+            const SizedBox(height: 30),
+            const _ApplyFiltersButton(),
+
+            const SizedBox(height: 30),
+          ],
+        ),
+      );
+    });
   }
 }
 

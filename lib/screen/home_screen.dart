@@ -1,3 +1,4 @@
+import 'package:auto_size_text/auto_size_text.dart';
 import 'package:bored_app/application.dart';
 import 'package:bored_app/bloc/activity/activities_bloc.dart';
 import 'package:bored_app/exceptions/activities_error.dart';
@@ -17,7 +18,10 @@ class HomeScreen extends StatefulWidget {
 
 class _HomeScreenState extends State<HomeScreen> {
   int _selectedTab = 0;
-  final List<String> _tabTitles = ['Activities', 'Help me find an activity'];
+  final List<String> _tabTitles = [
+    'Activities',
+    'Help me find an activity',
+  ];
 
   @override
   Widget build(BuildContext context) {
@@ -73,13 +77,13 @@ class _HomeScreenState extends State<HomeScreen> {
                   vertical: 20,
                 ),
                 child: Row(
-                  mainAxisSize: MainAxisSize.max,
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   crossAxisAlignment: CrossAxisAlignment.center,
                   children: [
                     Flexible(
-                      child: Text(
+                      child: AutoSizeText(
                         _tabTitles[_selectedTab],
+                        maxLines: 2,
                         style: const TextStyle(
                           fontSize: 28,
                           fontWeight: FontWeight.bold,

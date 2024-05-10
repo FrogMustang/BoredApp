@@ -54,6 +54,8 @@ dependencies:
   logger: ^2.2.0 # logging e.g. errors, warnings
   flutter_dotenv: ^5.1.0 # used for environment variables
 
+  auto_size_text: ^3.0.0 # used to fit text
+
 dev_dependencies:
   flutter_test:
     sdk: flutter
